@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Un campo de flores para vos <3</title>
+  <meta name="description" content="Un pequeño regalo para Male, con amor.">
+  <style>
+    :root {
+      --green: #4f7d5b;
+      --green-dark: #35563e;
+      --green-soft: #eaf2eb;
+      --cream: #fffdf8;
+      --text: #263229;
+      --muted: #718077;
+      --white: rgba(255,255,255,.94);
+      --shadow: 0 18px 50px rgba(35, 55, 40, .12);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 0%, #f4f8f3 0, transparent 35%),
+        var(--cream);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .hero {
+      min-height: 100vh;
+      padding: 28px 18px 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-inner {
+      width: min(1050px, 100%);
+      text-align: center;
+    }
+
+    .eyebrow {
+      color: var(--green);
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-size: .78rem;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 6vw, 4.7rem);
+      line-height: 1.05;
+      letter-spacing: -.045em;
+      font-weight: 800;
+    }
+
+    .intro {
+      max-width: 650px;
+      margin: 18px auto 28px;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.15rem);
+    }
+
+    .days-card {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 8px;
+      padding: 11px 18px;
+      border: 1px solid rgba(79,125,91,.18);
+      background: rgba(255,255,255,.72);
+      border-radius: 999px;
+      box-shadow: 0 8px 30px rgba(35,55,40,.07);
+      margin-bottom: 28px;
+    }
+
+    .days {
+      color: var(--green-dark);
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    .field-wrap {
+      width: min(500px, 100%);
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .field {
+      position: relative;
+      aspect-ratio: 500 / 667;
+      overflow: hidden;
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      background: #d9ddd4;
+      isolation: isolate;
+    }
+
+    .field::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,.03), rgba(0,0,0,.08));
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .field img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .flower {
+      position: absolute;
+      z-index: 3;
+      width: 46px;
+      height: 46px;
+      padding: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.82);
+      background: rgba(79,125,91,.18);
+      box-shadow: 0 0 0 5px rgba(255,255,255,.18), 0 5px 18px rgba(0,0,0,.12);
+      cursor: pointer;
+      transition: transform .2s ease, background .2s ease;
+      backdrop-filter: blur(2px);
+    }
+
+    .flower::before {
+      content: "♡";
+      color: white;
+      font-size: 20px;
+      line-height: 1;
+      text-shadow: 0 1px 5px rgba(0,0,0,.4);
+    }
+
+    .flower:hover,
+    .flower:focus-visible {
+      transform: scale(1.12);
+      background: rgba(79,125,91,.42);
+      outline: none;
+    }
+
+    .hint {
+      margin-top: 14px;
+      color: white;
+      background: rgba(38,50,41,.68);
+      display: inline-block;
+      padding: 7px 13px;
+      border-radius: 999px;
+      font-size: .82rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .section {
+      width: min(900px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 80px 0;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .section-title h2 {
+      margin: 0 0 7px;
+      font-size: clamp(1.8rem, 4vw, 2.7rem);
+      letter-spacing: -.035em;
+    }
+
+    .section-title p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .message-box {
+      min-height: 88px;
+      margin: 22px auto 0;
+      max-width: 680px;
+      padding: 18px 20px;
+      border-radius: 18px;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      text-align: center;
+      opacity: 0;
+      transform: translateY(7px);
+      transition: .25s ease;
+      pointer-events: none;
+    }
+
+    .message-box.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .message-box strong {
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .game-card,
+    .letter-card {
+      background: rgba(255,255,255,.9);
+      border: 1px solid rgba(79,125,91,.13);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: clamp(20px, 4vw, 36px);
+    }
+
+    .progress {
+      height: 8px;
+      background: #edf1ed;
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 20px 0 25px;
+    }
+
+    .progress > span {
+      display: block;
+      width: 0%;
+      height: 100%;
+      background: var(--green);
+      transition: width .3s ease;
+    }
+
+    .word-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .word {
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: #f0f4f0;
+      color: var(--green-dark);
+      font-size: .88rem;
+      transition: .2s;
+    }
+
+    .word.found {
+      text-decoration: line-through;
+      opacity: .48;
+      background: var(--green-soft);
+    }
+
+    .grid {
+      width: min(540px, 100%);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 5px;
+      user-select: none;
+    }
+
+    .cell {
+      aspect-ratio: 1;
+      border: 0;
+      border-radius: 9px;
+      background: #f5f7f4;
+      color: var(--text);
+      font-weight: 800;
+      cursor: pointer;
+      transition: .12s ease;
+    }
+
+    .cell:hover,
+    .cell.selected {
+      background: #dfeade;
+      color: var(--green-dark);
+    }
+
+    .cell.found {
+      background: var(--green);
+      color: white;
+    }
+
+    .game-status {
+      min-height: 28px;
+      margin-top: 18px;
+      text-align: center;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    .unlock {
+      display: none;
+      text-align: center;
+      margin-top: 24px;
+      padding: 16px;
+      border-radius: 18px;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font-weight: 700;
+    }
+
+    .unlock.show {
+      display: block;
+      animation: appear .45s ease;
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .letter-section {
+      display: none;
+    }
+
+    .letter-section.show {
+      display: block;
+      animation: appear .7s ease;
+    }
+
+    .letter-card {
+      max-width: 760px;
+      margin: auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .letter-card::before {
+      content: "♡";
+      position: absolute;
+      top: -24px;
+      right: 20px;
+      color: rgba(79,125,91,.08);
+      font-size: 170px;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .letter {
+      position: relative;
+      z-index: 1;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.08rem;
+    }
+
+    .letter p {
+      margin: 0 0 18px;
+    }
+
+    .letter .signature {
+      color: var(--green-dark);
+      font-weight: 700;
+      margin-top: 28px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px 18px 55px;
+      color: #8b978e;
+      font-size: .84rem;
+    }
+
+    @media (max-width: 520px) {
+      .hero { padding-top: 35px; }
+      .field { border-radius: 20px; }
+      .flower { width: 40px; height: 40px; }
+      .flower::before { font-size: 17px; }
+      .grid { gap: 3px; }
+      .cell { border-radius: 6px; font-size: .82rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="eyebrow">Para Male · 21 de septiembre 🌱</div>
+        <h1>Un campo de flores para vos &lt;3</h1>
+        <p class="intro">
+          Porque unas flores podían durar unos días, pero quería regalarte algo
+          que pudiéramos recorrer juntos.
+        </p>
+
+        <div class="days-card">
+          <span class="days" id="daysTogether">0</span>
+          <span>días juntos</span>
+        </div>
+
+        <div class="field-wrap">
+          <div class="field">
+            <img src="assets/flores.png" alt="Campo de girasoles">
+            <!-- Hotspots colocados sobre distintas flores de la fotografía -->
+            <button class="flower" style="left:11%; top:65%;" data-title="Para vos" data-message="De todas las flores de este campo, siempre elegiría la que me lleve hasta vos."></button>
+            <button class="flower" style="left:37%; top:65%;" data-title="Mi lugar favorito" data-message="No importa dónde estemos: si estoy con vos, siento que estoy en mi lugar favorito."></button>
+            <button class="flower" style="left:54%; top:57%;" data-title="Tu sonrisa" data-message="Tu sonrisa tiene esa costumbre hermosa de hacer que cualquier día sea un poquito mejor."></button>
+            <button class="flower" style="left:22%; top:54%;" data-title="Gracias" data-message="Gracias por acompañarme, por bancarme y por compartir conmigo cada etapa de estos años."></button>
+            <button class="flower" style="left:43%; top:53%;" data-title="Juntos" data-message="Desde aquel 13 de octubre de 2022 fuimos construyendo nuestra propia historia, paso a paso."></button>
+            <button class="flower" style="left:76%; top:55%;" data-title="Primaveras" data-message="Ojalá podamos seguir coleccionando primaveras, inviernos, veranos y otoños juntos."></button>
+            <button class="flower" style="left:4%; top:61%;" data-title="Mi persona" data-message="Sos una de esas personas que hacen que la vida se sienta más linda simplemente por estar."></button>
+            <button class="flower" style="left:62%; top:65%;" data-title="Te admiro" data-message="Me encanta verte crecer, aprender y perseguir todo aquello que soñás."></button>
+            <button class="flower" style="left:18%; top:76%;" data-title="Nuestro futuro" data-message="Todavía nos quedan muchísimas cosas por vivir, descubrir y lograr juntos."></button>
+            <button class="flower" style="left:41%; top:75%;" data-title="Amor" data-message="Te amo muchísimo, Male. Más de lo que a veces sé explicar con palabras."></button>
+            <button class="flower" style="left:61%; top:77%;" data-title="Siempre" data-message="Si pudiera elegir de nuevo, volvería a elegir cada momento que nos trajo hasta acá."></button>
+            <button class="flower" style="left:90%; top:62%;" data-title="Una promesa" data-message="Quiero seguir estando a tu lado mientras hacemos realidad todo eso que alguna vez imaginamos."></button>
+
+            <div class="hint">Tocá las pequeñas flores ♡</div>
+          </div>
+
+          <div class="message-box" id="messageBox" aria-live="polite">
+            <strong id="messageTitle"></strong>
+            <span id="messageText"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">
+        <div class="eyebrow">Segundo desafío</div>
+        <h2>Una pequeña sopa de letras</h2>
+        <p>Encontrá todas las palabras. Tocá la primera y después la última letra.</p>
+      </div>
+
+      <div class="game-card">
+        <div class="word-list" id="wordList"></div>
+        <div class="progress"><span id="progressBar"></span></div>
+        <div class="grid" id="grid"></div>
+        <div class="game-status" id="gameStatus">Hay 8 palabras escondidas.</div>
+        <div class="unlock" id="unlock">
+          ✨ Lo lograste. Ahora sí, hay algo esperándote abajo.
+        </div>
+      </div>
+    </section>
+
+    <section class="section letter-section" id="letterSection">
+      <div class="section-title">
+        <div class="eyebrow">Para vos, Male</div>
+        <h2>Una carta que sí podés guardar</h2>
+      </div>
+
+      <article class="letter-card">
+        <div class="letter">
+          <p>Hola, mi amor &lt;3</p>
+
+          <p>
+            Feliz primavera. Perdón por hacerte llegar tarde el regalo,
+            pero quería hacer algo distinto a unas simples flores, porque
+            te merecés todo en este mundo.
+          </p>
+
+          <p>
+            Muchas gracias por estar conmigo tanto tiempo, por pasar tantas
+            primaveras y tantas épocas del año juntos.
+          </p>
+
+          <p>
+            Te amo muchísimo y ya vas a ver cómo vamos a lograr todo lo que
+            nos propongamos juntos.
+          </p>
+
+          <p>
+            Te amo, mi amor &lt;3. Feliz primavera.
+          </p>
+
+          <p class="signature">Con todo mi amor ♡</p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    Hecho especialmente para Male · 13/10/2022 → siempre ♡
+  </footer>
+
+  <script>
+    // -------------------------
+    // Contador de días
+    // -------------------------
+    const startDate = new Date(2022, 9, 13); // 13/10/2022
+    const today = new Date();
+    startDate.setHours(0,0,0,0);
+    today.setHours(0,0,0,0);
+
+    const days = Math.max(0, Math.floor((today - startDate) / 86400000));
+    document.getElementById("daysTogether").textContent =
+      days.toLocaleString("es-AR");
+
+    // -------------------------
+    // Flores / mensajes
+    // -------------------------
+    const flowers = document.querySelectorAll(".flower");
+    const messageBox = document.getElementById("messageBox");
+    const messageTitle = document.getElementById("messageTitle");
+    const messageText = document.getElementById("messageText");
+
+    flowers.forEach((flower) => {
+      flower.addEventListener("click", () => {
+        messageTitle.textContent = flower.dataset.title;
+        messageText.textContent = flower.dataset.message;
+        messageBox.classList.add("show");
+      });
+    });
+
+    // -------------------------
+    // Sopa de letras
+    // -------------------------
+    const WORDS = [
+      "AMOR",
+      "MALE",
+      "JUNTOS",
+      "SIEMPRE",
+      "PRIMAVERA",
+      "SONRISA",
+      "ABRAZO",
+      "BESOS"
+    ];
+
+    const SIZE = 10;
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const directions = [
+      [0,1], [0,-1], [1,0], [-1,0],
+      [1,1], [1,-1], [-1,1], [-1,-1]
+    ];
+
+    const gridElement = document.getElementById("grid");
+    const wordListElement = document.getElementById("wordList");
+    const statusElement = document.getElementById("gameStatus");
+    const progressBar = document.getElementById("progressBar");
+    const unlock = document.getElementById("unlock");
+    const letterSection = document.getElementById("letterSection");
+
+    let board = [];
+    let placements = [];
+    let firstCell = null;
+    let foundWords = new Set();
+
+    function emptyBoard() {
+      return Array.from({ length: SIZE }, () =>
+        Array.from({ length: SIZE }, () => "")
+      );
+    }
+
+    function canPlace(word, r, c, dr, dc) {
+      const endR = r + dr * (word.length - 1);
+      const endC = c + dc * (word.length - 1);
+
+      if (endR < 0 || endR >= SIZE || endC < 0 || endC >= SIZE) return false;
+
+      for (let i = 0; i < word.length; i++) {
+        const rr = r + dr * i;
+        const cc = c + dc * i;
+        if (board[rr][cc] && board[rr][cc] !== word[i]) return false;
+      }
+      return true;
+    }
+
+    function placeWord(word) {
+      const options = [];
+
+      for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+          for (const [dr, dc] of directions) {
+            if (canPlace(word, r, c, dr, dc)) {
+              options.push({ r, c, dr, dc });
+            }
+          }
+        }
+      }
+
+      // Mezclamos las opciones para que la sopa no quede demasiado obvia.
+      options.sort(() => Math.random() - 0.5);
+
+      const chosen = options[0];
+      if (!chosen) return false;
+
+      const { r, c, dr, dc } = chosen;
+      const cells = [];
+
+      for (let i = 0; i < word.length; i++) {
+        const rr = r + dr * i;
+        const cc = c + dc * i;
+        board[rr][cc] = word[i];
+        cells.push(`${rr}-${cc}`);
+      }
+
+      placements.push({ word, cells });
+      return true;
+    }
+
+    function buildBoard() {
+      // Reintentar si alguna palabra no entra.
+      for (let attempt = 0; attempt < 100; attempt++) {
+        board = emptyBoard();
+        placements = [];
+        let ok = true;
+
+        // Colocamos las palabras largas primero.
+        for (const word of [...WORDS].sort((a,b) => b.length - a.length)) {
+          if (!placeWord(word)) {
+            ok = false;
+            break;
+          }
+        }
+
+        if (ok) break;
+      }
+
+      for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+          if (!board[r][c]) {
+            board[r][c] = alphabet[Math.floor(Math.random() * alphabet.length)];
+          }
+        }
+      }
+    }
+
+    function renderWords() {
+      wordListElement.innerHTML = "";
+      WORDS.forEach(word => {
+        const el = document.createElement("span");
+        el.className = "word";
+        el.id = `word-${word}`;
+        el.textContent = word;
+        wordListElement.appendChild(el);
+      });
+    }
+
+    function renderGrid() {
+      gridElement.innerHTML = "";
+      board.forEach((row, r) => {
+        row.forEach((letter, c) => {
+          const button = document.createElement("button");
+          button.className = "cell";
+          button.textContent = letter;
+          button.dataset.r = r;
+          button.dataset.c = c;
+          button.addEventListener("click", () => selectCell(button));
+          gridElement.appendChild(button);
+        });
+      });
+    }
+
+    function getCell(r, c) {
+      return gridElement.querySelector(`[data-r="${r}"][data-c="${c}"]`);
+    }
+
+    function clearSelection() {
+      gridElement.querySelectorAll(".selected").forEach(el => {
+        el.classList.remove("selected");
+      });
+      firstCell = null;
+    }
+
+    function selectCell(cell) {
+      const r = Number(cell.dataset.r);
+      const c = Number(cell.dataset.c);
+
+      if (!firstCell) {
+        firstCell = { r, c };
+        cell.classList.add("selected");
+        statusElement.textContent = "Ahora tocá la última letra de la palabra.";
+        return;
+      }
+
+      const second = { r, c };
+      const dr = Math.sign(second.r - firstCell.r);
+      const dc = Math.sign(second.c - firstCell.c);
+      const rowDiff = Math.abs(second.r - firstCell.r);
+      const colDiff = Math.abs(second.c - firstCell.c);
+
+      // Debe ser horizontal, vertical o diagonal.
+      const straight = (rowDiff === 0 || colDiff === 0 || rowDiff === colDiff);
+
+      if (!straight || (dr === 0 && dc === 0)) {
+        clearSelection();
+        statusElement.textContent = "Esa selección no es una línea válida. Probá de nuevo.";
+        return;
+      }
+
+      const cells = [];
+      let rr = firstCell.r;
+      let cc = firstCell.c;
+
+      while (true) {
+        cells.push(`${rr}-${cc}`);
+        if (rr === second.r && cc === second.c) break;
+        rr += dr;
+        cc += dc;
+      }
+
+      const reverse = [...cells].reverse();
+      const match = placements.find(p =>
+        !foundWords.has(p.word) &&
+        (p.cells.join("|") === cells.join("|") ||
+         p.cells.join("|") === reverse.join("|"))
+      );
+
+      if (match) {
+        foundWords.add(match.word);
+        cells.forEach(key => {
+          const [cr, cc2] = key.split("-").map(Number);
+          getCell(cr, cc2)?.classList.add("found");
+        });
+
+        document.getElementById(`word-${match.word}`)?.classList.add("found");
+        statusElement.textContent = `Encontraste: ${match.word} ♡`;
+
+        const percent = (foundWords.size / WORDS.length) * 100;
+        progressBar.style.width = `${percent}%`;
+
+        if (foundWords.size === WORDS.length) {
+          unlock.classList.add("show");
+          statusElement.textContent = "¡Encontraste todas! La carta está desbloqueada. ♡";
+
+          setTimeout(() => {
+            letterSection.classList.add("show");
+            letterSection.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 650);
+        }
+      } else {
+        statusElement.textContent = "No era una de las palabras. Probá otra combinación.";
+      }
+
+      clearSelection();
+    }
+
+    buildBoard();
+    renderWords();
+    renderGrid();
+  </script>
+</body>
+</html>
